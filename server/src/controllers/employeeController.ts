@@ -7,7 +7,6 @@ import asyncHandler from 'express-async-handler';
 import prisma from '../db.js';
 import bcrypt from 'bcryptjs';
 import speakeasy from 'speakeasy';
-import { UserRole } from '@prisma/client';
 
 const generateAvatar = (name: string): string => {
     const initials = (name || '?').trim().split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
@@ -32,7 +31,7 @@ export const getEmployees = asyncHandler(async (req: Request, res: Response) => 
 // @route   POST /api/employees
 // @access  Private (Admin/HR)
 export const createEmployee = asyncHandler(async (req: any, res: Response) => {
-    if (req.user.role !== UserRole.Admin && req.user.role !== UserRole.HR) {
+    if (req.user.role !== 'Admin' && req.user.role !== 'HR') {
         res.status(403);
         throw new Error('Not authorized to create employees');
     }
@@ -79,7 +78,7 @@ export const createEmployee = asyncHandler(async (req: any, res: Response) => {
 // @route   PUT /api/employees/:id
 // @access  Private (Admin/HR)
 export const updateEmployee = asyncHandler(async (req: any, res: Response) => {
-     if (req.user.role !== UserRole.Admin && req.user.role !== UserRole.HR) {
+     if (req.user.role !== 'Admin' && req.user.role !== 'HR') {
         res.status(403);
         throw new Error('Not authorized to update employees');
     }
@@ -96,7 +95,7 @@ export const updateEmployee = asyncHandler(async (req: any, res: Response) => {
 // @route   DELETE /api/employees/:id
 // @access  Private (Admin)
 export const deleteEmployee = asyncHandler(async (req: any, res: Response) => {
-    if (req.user.role !== UserRole.Admin) {
+    if (req.user.role !== 'Admin') {
         res.status(403);
         throw new Error('Not authorized to delete employees');
     }

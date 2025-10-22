@@ -22,7 +22,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     if (employee && (await bcrypt.compare(password, employee.passwordHash))) {
         // Don't issue the final token here if MFA is enabled but not verified
         // The frontend will handle the MFA verification step
-        const { passwordHash, mfaSecret, ...userWithoutSensitiveData } = employee;
+        const { passwordHash, mfaSecret, ...userWithoutSensitiveData } = employee as any;
         res.json({
             ...userWithoutSensitiveData,
             mfaSecret: !employee.isMfaSetup ? mfaSecret : undefined, // only send secret if not set up
@@ -50,7 +50,7 @@ export const updateProfile = asyncHandler(async (req: any, res: Response) => {
         where: { id: req.user.id },
         data: { name, email, phone },
     });
-    const { passwordHash, mfaSecret, ...userWithoutSensitiveData } = updatedUser;
+    const { passwordHash, mfaSecret, ...userWithoutSensitiveData } = updatedUser as any;
     res.json(userWithoutSensitiveData);
 });
 
