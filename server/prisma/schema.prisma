@@ -1,1 +1,117 @@
-~�er��z{l��������f���^��+&h
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id            String           @id @default(cuid())
+  employeeId    String           @unique
+  name          String
+  email         String           @unique
+  phone         String
+  role          String
+  avatarUrl     String
+  isMfaSetup    Boolean          @default(false)
+  mfaSecret     String
+  passwordHash  String
+  departmentId  String
+  department    Department       @relation(fields: [departmentId], references: [id])
+  joinDate      DateTime
+  status        String
+  employeeType  String
+  salary        Float
+
+  // Relations
+  attendanceRecords AttendanceRecord[]
+  leaveRequests     LeaveRequest[]
+  leaveBalances     LeaveBalance[]
+  payrollRecords    PayrollRecord[]
+
+  // Optional manager of a department (back relation)
+  managedDepartment Department? @relation("DepartmentManager")
+}
+
+model Department {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  managerId String?    @unique
+  manager   Employee?  @relation("DepartmentManager", fields: [managerId], references: [id])
+  employees Employee[]
+}
+
+model AttendanceRecord {
+  id         String            @id @default(cuid())
+  employeeId String
+  employee   Employee          @relation(fields: [employeeId], references: [id])
+  date       DateTime
+  status     String
+  clockIn    DateTime?
+  clockOut   DateTime?
+  workHours  Int?
+
+  @@unique([employeeId, date], name: "employeeId_date")
+  @@index([employeeId, date])
+}
+
+model LeaveRequest {
+  id           String       @id @default(cuid())
+  employeeId   String
+  employee     Employee     @relation(fields: [employeeId], references: [id])
+  employeeName String
+  leaveType    String
+  startDate    DateTime
+  endDate      DateTime
+  reason       String
+  status       String
+  days         Int
+  createdAt    DateTime     @default(now())
+}
+
+model LeaveBalance {
+  id         String     @id @default(cuid())
+  employeeId String
+  employee   Employee   @relation(fields: [employeeId], references: [id])
+  type       String
+  total      Int
+  used       Int        @default(0)
+  pending    Int        @default(0)
+
+  @@unique([employeeId, type])
+}
+
+model Holiday {
+  id    String   @id @default(cuid())
+  date  DateTime
+  name  String
+}
+
+model PayrollRecord {
+  id          String        @id @default(cuid())
+  employeeId  String
+  employee    Employee      @relation(fields: [employeeId], references: [id])
+  month       Int
+  year        Int
+  basic       Float
+  allowancesHra       Float
+  allowancesSpecial   Float
+  deductionsTax       Float
+  deductionsProvident Float
+  deductionsAbsence   Float
+  grossPay    Float
+  netPay      Float
+  status      String
+  createdAt   DateTime      @default(now())
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  title      String
+  message    String
+  timestamp  DateTime @default(now())
+  read       Boolean  @default(false)
+  link       String?
+}

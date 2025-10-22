@@ -41,6 +41,6 @@ app.get('/api', (req: Request, res: Response) => {
     res.json({ message: 'HRMS API is running...' });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+app.listen(3001, () => console.log(`🚀 Server running on http://localhost:3001`));
